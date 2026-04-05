@@ -43,6 +43,8 @@ export const pollRouter = createTRPCRouter({
       orderBy: (p, { desc }) => [desc(p.startTime)],
       with: {
         candidates: { columns: { id: true } },
+        // Added: Fetch votes to get the count
+        votes: { columns: { id: true } },
       },
     });
 
@@ -55,7 +57,9 @@ export const pollRouter = createTRPCRouter({
 
     return polls.map((p) => ({
       ...p,
-      candidateCount: (p as any).candidates.length,
+      candidateCount: (p as any).candidates?.length ?? 0,
+      // Added: Map the votes array length to votesCast for the frontend
+      votesCast: (p as any).votes?.length ?? 0,
       hasVoted: votedPollIds.has(p.id),
     }));
   }),
@@ -69,7 +73,8 @@ export const pollRouter = createTRPCRouter({
         where: eq(poll.id, input.pollId),
         with: {
           candidates: {
-            orderBy: (c: { order: any; }, { asc }: any) => [asc(c.order)],
+            // Fix: Use the 'c' argument which represents the table fields, not the table definition
+            orderBy: (c, { asc }) => [asc(c.order)],
           },
         },
       });
@@ -85,8 +90,10 @@ export const pollRouter = createTRPCRouter({
         columns: { usedAt: true },
       });
 
+      // Fix: Spread 'found' and explicitly cast/handle candidates to resolve 'never' errors
       return {
         ...found,
+        candidates: ((found as any).candidates ?? []) as (typeof candidate.$inferSelect)[],
         hasVoted: !!token,
         votedAt: token?.usedAt ?? null,
       };

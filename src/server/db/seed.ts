@@ -1,6 +1,7 @@
-import { hash } from "@node-rs/argon2";
-import { drizzle } from "drizzle-orm/postgres-js"; // Changed import
-import postgres from "postgres";                  // Changed import
+import "dotenv/config"; 
+import { hashPassword } from "better-auth/crypto"; // Changed to Better Auth utility
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 
 import * as schema from "./schema";
 import { generateId } from "../lib/ids";
@@ -15,7 +16,6 @@ const ADMINS = [
 ];
 
 async function seed() {
-  // Use postgres-js client instead of pg Pool
   const client = postgres(process.env.DATABASE_URL!);
   const db = drizzle(client, { schema });
 
@@ -31,16 +31,10 @@ async function seed() {
       continue;
     }
 
-    const passwordHash = await hash(admin.password, {
-      memoryCost: 19456,
-      timeCost: 2,
-      outputLen: 32,
-      parallelism: 1,
-    });
+    // Use Better Auth's internal hashing
+    const passwordHash = await hashPassword(admin.password);
 
-    const userId = generateId();
-    
-    // This now receives the correct database type
+    const userId = generateId("usr");
     const voterCardId = await generateVoterCardId(db);
 
     await db.insert(schema.user).values({
@@ -60,10 +54,10 @@ async function seed() {
 
     await db.insert(schema.account).values({
       id: generateId(),
-      accountId: userId,
+      accountId: admin.email, // CRITICAL: Must be the email for credential provider
       providerId: "credential",
       userId,
-      password: passwordHash,
+      password: passwordHash, // Correct hash format
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -73,7 +67,6 @@ async function seed() {
 
   console.log("\n✅ Seed complete.");
   
-  // Close the connection properly
   await client.end();
   process.exit(0);
 }

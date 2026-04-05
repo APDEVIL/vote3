@@ -139,9 +139,10 @@ export const zPaginationInput = z.object({
   limit: z.number().int().min(1).max(100).default(20),
 });
 
-export type RegisterInput          = z.infer<typeof zRegisterInput>;
-export type LoginInput             = z.infer<typeof zLoginInput>;
-export type CreatePollInput        = z.infer<typeof zCreatePollInput>;
-export type CastVoteInput          = z.infer<typeof zCastVoteInput>;
+export type RegisterInput            = z.infer<typeof zRegisterInput>;
+export type LoginInput               = z.infer<typeof zLoginInput>;
+export type UpdateProfileInput       = z.infer<typeof zUpdateProfileInput>; // Added this
+export type CreatePollInput          = z.infer<typeof zCreatePollInput>;
+export type CastVoteInput            = z.infer<typeof zCastVoteInput>;
 export type SubmitParticipationInput = z.infer<typeof zSubmitParticipationInput>;
-export type ReviewRequestInput     = z.infer<typeof zReviewRequestInput>;
+export type ReviewRequestInput       = z.infer<typeof zReviewRequestInput>;

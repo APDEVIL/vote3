@@ -5,17 +5,19 @@ import {
 	text,
 	timestamp,
 } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm"; // Added
 
 import { user } from "./auth";
+import { vote } from "./vote"; // Added to link relations
 
 // ── Enums ──────────────────────────────────────────────────────────────────────
 
 /**
  * Poll lifecycle (SRS §4.3):
- *   created         → poll configured, not yet open
- *   active          → voting is ongoing (within startTime–endTime)
- *   ended           → voting closed, results not yet published
- *   result_available → results visible to admin + voters
+ * created         → poll configured, not yet open
+ * active          → voting is ongoing (within startTime–endTime)
+ * ended           → voting closed, results not yet published
+ * result_available → results visible to admin + voters
  */
 export const pollStatusEnum = pgEnum("poll_status", [
 	"created",
@@ -63,6 +65,25 @@ export const candidate = pgTable("candidate", {
 
 	createdAt: timestamp("created_at").notNull().defaultNow(),
 });
+
+// ── Relations (Added to fix the "undefined" crash) ───────────────────────────
+
+export const pollRelations = relations(poll, ({ many, one }) => ({
+	candidates: many(candidate),
+	votes: many(vote),
+	author: one(user, {
+		fields: [poll.createdBy],
+		references: [user.id],
+	}),
+}));
+
+export const candidateRelations = relations(candidate, ({ one, many }) => ({
+	poll: one(poll, {
+		fields: [candidate.pollId],
+		references: [poll.id],
+	}),
+	votes: many(vote),
+}));
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 

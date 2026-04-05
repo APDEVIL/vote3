@@ -2,11 +2,11 @@
  * routers/admin.router.ts
  *
  * Epics covered:
- *   6.1–6.3 Admin authentication (handled by better-auth + adminProcedure)
- *   7.1–7.5 Poll management
- *   8.1–8.3 Poll monitoring
- *   9.1–9.3 Result management
- *   10.1–10.4 Voter verification
+ * 6.1–6.3 Admin authentication (handled by better-auth + adminProcedure)
+ * 7.1–7.5 Poll management
+ * 8.1–8.3 Poll monitoring
+ * 9.1–9.3 Result management
+ * 10.1–10.4 Voter verification
  *
  * ALL procedures use adminProcedure — non-admins get FORBIDDEN.
  */
@@ -197,7 +197,9 @@ export const adminRouter = createTRPCRouter({
       const found = await ctx.db.query.poll.findFirst({
         where: eq(poll.id, input.pollId),
         with: {
-          candidates: { orderBy: (c: { order: any; }, { asc }: any) => [asc(c.order)] },
+          candidates: { 
+            orderBy: (c, { asc }) => [asc(c.order)] 
+          },
         },
       });
       if (!found) throw pollNotFoundError();
@@ -217,6 +219,8 @@ export const adminRouter = createTRPCRouter({
 
       return {
         ...found,
+        // Fix: Explicitly type candidates to avoid 'never' on frontend
+        candidates: (found.candidates ?? []) as (typeof candidate.$inferSelect)[],
         votesCast: voteCount?.count ?? 0,
         approvedParticipants: approvedCount?.count ?? 0,
       };

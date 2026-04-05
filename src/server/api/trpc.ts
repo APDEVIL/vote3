@@ -69,9 +69,6 @@ export const protectedProcedure = t.procedure
 
 /**
  * Admin — logged-in user with role "admin".
- *
- * Admins are created via `pnpm db:seed` — never via the register form.
- * Role is stored in user.role column, set to "admin" by the seed script.
  */
 export const adminProcedure = t.procedure
   .use(timingMiddleware)
@@ -79,20 +76,22 @@ export const adminProcedure = t.procedure
     if (!ctx.session?.user) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
-    // Cast needed because better-auth's inferred type doesn't include our
-    // custom `role` column — it's there at runtime via drizzleAdapter
+
+    // Cast the user to include the role field we added in the config
     const user = ctx.session.user as typeof ctx.session.user & { role: string };
+
     if (user.role !== "admin") {
       throw new TRPCError({
         code: "FORBIDDEN",
         message: "This action is restricted to admins only.",
       });
     }
+
     return next({
       ctx: {
         session: {
           ...ctx.session,
-          user: ctx.session.user,
+          user: user, // Pass the casted user with the role
         },
       },
     });

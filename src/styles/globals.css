@@ -1,238 +1,250 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
-@theme {
-	--font-sans:
-		var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
-		"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-}
+/*
+ * VoteSecure — dark navy theme
+ * Matches the reference design: deep navy bg + cyan accent + subtle slate borders
+ */
 
 @theme inline {
-	--font-heading:
-		var(--font-sans);
-	--font-sans:
-		var(--font-sans);
-	--color-sidebar-ring:
-		var(--sidebar-ring);
-	--color-sidebar-border:
-		var(--sidebar-border);
-	--color-sidebar-accent-foreground:
-		var(--sidebar-accent-foreground);
-	--color-sidebar-accent:
-		var(--sidebar-accent);
-	--color-sidebar-primary-foreground:
-		var(--sidebar-primary-foreground);
-	--color-sidebar-primary:
-		var(--sidebar-primary);
-	--color-sidebar-foreground:
-		var(--sidebar-foreground);
-	--color-sidebar:
-		var(--sidebar);
-	--color-chart-5:
-		var(--chart-5);
-	--color-chart-4:
-		var(--chart-4);
-	--color-chart-3:
-		var(--chart-3);
-	--color-chart-2:
-		var(--chart-2);
-	--color-chart-1:
-		var(--chart-1);
-	--color-ring:
-		var(--ring);
-	--color-input:
-		var(--input);
-	--color-border:
-		var(--border);
-	--color-destructive:
-		var(--destructive);
-	--color-accent-foreground:
-		var(--accent-foreground);
-	--color-accent:
-		var(--accent);
-	--color-muted-foreground:
-		var(--muted-foreground);
-	--color-muted:
-		var(--muted);
-	--color-secondary-foreground:
-		var(--secondary-foreground);
-	--color-secondary:
-		var(--secondary);
-	--color-primary-foreground:
-		var(--primary-foreground);
-	--color-primary:
-		var(--primary);
-	--color-popover-foreground:
-		var(--popover-foreground);
-	--color-popover:
-		var(--popover);
-	--color-card-foreground:
-		var(--card-foreground);
-	--color-card:
-		var(--card);
-	--color-foreground:
-		var(--foreground);
-	--color-background:
-		var(--background);
-	--radius-sm:
-		calc(var(--radius) * 0.6);
-	--radius-md:
-		calc(var(--radius) * 0.8);
-	--radius-lg:
-		var(--radius);
-	--radius-xl:
-		calc(var(--radius) * 1.4);
-	--radius-2xl:
-		calc(var(--radius) * 1.8);
-	--radius-3xl:
-		calc(var(--radius) * 2.2);
-	--radius-4xl:
-		calc(var(--radius) * 2.6);
+  /* ── Backgrounds ─────────────────────────────────── */
+  --color-background:          oklch(0.09 0.018 250);   /* #060d1a deepest navy  */
+  --color-foreground:          oklch(0.93 0.008 250);   /* #e8edf5 off-white     */
+
+  --color-card:                oklch(0.12 0.022 250);   /* #0d1526 card navy     */
+  --color-card-foreground:     oklch(0.93 0.008 250);
+
+  --color-popover:             oklch(0.14 0.022 250);
+  --color-popover-foreground:  oklch(0.93 0.008 250);
+
+  /* ── Primary — cyan accent ───────────────────────── */
+  --color-primary:             oklch(0.72 0.175 205);   /* #00c8e0 cyan          */
+  --color-primary-foreground:  oklch(0.09 0.018 250);   /* navy on cyan          */
+
+  /* ── Secondary ───────────────────────────────────── */
+  --color-secondary:           oklch(0.18 0.025 250);
+  --color-secondary-foreground:oklch(0.75 0.015 250);
+
+  /* ── Muted ───────────────────────────────────────── */
+  --color-muted:               oklch(0.16 0.022 250);
+  --color-muted-foreground:    oklch(0.52 0.018 250);   /* slate-400 equiv       */
+
+  /* ── Accent ──────────────────────────────────────── */
+  --color-accent:              oklch(0.20 0.045 220);
+  --color-accent-foreground:   oklch(0.93 0.008 250);
+
+  /* ── Destructive ─────────────────────────────────── */
+  --color-destructive:         oklch(0.55 0.22 25);
+  --color-destructive-foreground: oklch(0.93 0.008 250);
+
+  /* ── Border / Input / Ring ───────────────────────── */
+  --color-border:              oklch(0.22 0.025 240);
+  --color-input:               oklch(0.15 0.025 245);
+  --color-ring:                oklch(0.72 0.175 205);   /* cyan focus ring       */
+
+  /* ── Chart colours ───────────────────────────────── */
+  --color-chart-1:             oklch(0.72 0.175 205);   /* cyan                  */
+  --color-chart-2:             oklch(0.65 0.175 145);   /* green                 */
+  --color-chart-3:             oklch(0.75 0.175 85);    /* amber                 */
+  --color-chart-4:             oklch(0.60 0.22  290);   /* purple                */
+  --color-chart-5:             oklch(0.60 0.22  25);    /* coral                 */
+
+  /* ── Sidebar ─────────────────────────────────────── */
+  --color-sidebar:                    oklch(0.10 0.022 250);
+  --color-sidebar-foreground:         oklch(0.80 0.015 250);
+  --color-sidebar-primary:            oklch(0.72 0.175 205);
+  --color-sidebar-primary-foreground: oklch(0.09 0.018 250);
+  --color-sidebar-accent:             oklch(0.16 0.028 245);
+  --color-sidebar-accent-foreground:  oklch(0.93 0.008 250);
+  --color-sidebar-border:             oklch(0.18 0.022 245);
+  --color-sidebar-ring:               oklch(0.72 0.175 205);
+
+  /* ── Radius ──────────────────────────────────────── */
+  --radius: 0.625rem;
 }
 
-:root {
-	--background:
-		oklch(1 0 0);
-	--foreground:
-		oklch(0.145 0 0);
-	--card:
-		oklch(1 0 0);
-	--card-foreground:
-		oklch(0.145 0 0);
-	--popover:
-		oklch(1 0 0);
-	--popover-foreground:
-		oklch(0.145 0 0);
-	--primary:
-		oklch(0.205 0 0);
-	--primary-foreground:
-		oklch(0.985 0 0);
-	--secondary:
-		oklch(0.97 0 0);
-	--secondary-foreground:
-		oklch(0.205 0 0);
-	--muted:
-		oklch(0.97 0 0);
-	--muted-foreground:
-		oklch(0.556 0 0);
-	--accent:
-		oklch(0.97 0 0);
-	--accent-foreground:
-		oklch(0.205 0 0);
-	--destructive:
-		oklch(0.577 0.245 27.325);
-	--border:
-		oklch(0.922 0 0);
-	--input:
-		oklch(0.922 0 0);
-	--ring:
-		oklch(0.708 0 0);
-	--chart-1:
-		oklch(0.87 0 0);
-	--chart-2:
-		oklch(0.556 0 0);
-	--chart-3:
-		oklch(0.439 0 0);
-	--chart-4:
-		oklch(0.371 0 0);
-	--chart-5:
-		oklch(0.269 0 0);
-	--radius:
-		0.625rem;
-	--sidebar:
-		oklch(0.985 0 0);
-	--sidebar-foreground:
-		oklch(0.145 0 0);
-	--sidebar-primary:
-		oklch(0.205 0 0);
-	--sidebar-primary-foreground:
-		oklch(0.985 0 0);
-	--sidebar-accent:
-		oklch(0.97 0 0);
-	--sidebar-accent-foreground:
-		oklch(0.205 0 0);
-	--sidebar-border:
-		oklch(0.922 0 0);
-	--sidebar-ring:
-		oklch(0.708 0 0);
+/* ── Base reset ───────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  border-color: var(--color-border);
+  outline-color: color-mix(in oklab, var(--color-ring) 50%, transparent);
 }
 
-.dark {
-	--background:
-		oklch(0.145 0 0);
-	--foreground:
-		oklch(0.985 0 0);
-	--card:
-		oklch(0.205 0 0);
-	--card-foreground:
-		oklch(0.985 0 0);
-	--popover:
-		oklch(0.205 0 0);
-	--popover-foreground:
-		oklch(0.985 0 0);
-	--primary:
-		oklch(0.922 0 0);
-	--primary-foreground:
-		oklch(0.205 0 0);
-	--secondary:
-		oklch(0.269 0 0);
-	--secondary-foreground:
-		oklch(0.985 0 0);
-	--muted:
-		oklch(0.269 0 0);
-	--muted-foreground:
-		oklch(0.708 0 0);
-	--accent:
-		oklch(0.269 0 0);
-	--accent-foreground:
-		oklch(0.985 0 0);
-	--destructive:
-		oklch(0.704 0.191 22.216);
-	--border:
-		oklch(1 0 0 / 10%);
-	--input:
-		oklch(1 0 0 / 15%);
-	--ring:
-		oklch(0.556 0 0);
-	--chart-1:
-		oklch(0.87 0 0);
-	--chart-2:
-		oklch(0.556 0 0);
-	--chart-3:
-		oklch(0.439 0 0);
-	--chart-4:
-		oklch(0.371 0 0);
-	--chart-5:
-		oklch(0.269 0 0);
-	--sidebar:
-		oklch(0.205 0 0);
-	--sidebar-foreground:
-		oklch(0.985 0 0);
-	--sidebar-primary:
-		oklch(0.488 0.243 264.376);
-	--sidebar-primary-foreground:
-		oklch(0.985 0 0);
-	--sidebar-accent:
-		oklch(0.269 0 0);
-	--sidebar-accent-foreground:
-		oklch(0.985 0 0);
-	--sidebar-border:
-		oklch(1 0 0 / 10%);
-	--sidebar-ring:
-		oklch(0.556 0 0);
+html {
+  color-scheme: dark;
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-	}
-  body {
-    @apply bg-background text-foreground;
-	}
-  html {
-    @apply font-sans;
-	}
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar           { width: 5px; height: 5px; }
+::-webkit-scrollbar-track     { background: transparent; }
+::-webkit-scrollbar-thumb     { background: var(--color-border); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: color-mix(in oklab, var(--color-muted-foreground) 60%, transparent); }
+* { scrollbar-width: thin; scrollbar-color: var(--color-border) transparent; }
+
+/* ── Selection ────────────────────────────────────────────────────────────── */
+
+::selection {
+  background: color-mix(in oklab, var(--color-primary) 25%, transparent);
+  color: var(--color-foreground);
+}
+
+/* ── Focus ring ───────────────────────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+/* ── Utility classes ──────────────────────────────────────────────────────── */
+
+/*
+ * Glowing cyan text — used for big stat numbers and hero headline.
+ * Usage: className="text-glow-cyan"
+ */
+.text-glow-cyan {
+  color: oklch(0.72 0.175 205);
+  text-shadow:
+    0 0 20px oklch(0.72 0.175 205 / 0.45),
+    0 0 60px oklch(0.72 0.175 205 / 0.15);
+}
+
+/*
+ * Active nav item — left cyan border + subtle glow bg.
+ * Applied automatically by voter-sidebar and admin-sidebar.
+ * Usage: className="nav-active text-primary"
+ */
+.nav-active {
+  background: linear-gradient(
+    90deg,
+    oklch(0.72 0.175 205 / 0.12) 0%,
+    transparent 100%
+  );
+  border-left: 2px solid oklch(0.72 0.175 205);
+  padding-left: calc(0.75rem - 2px); /* compensate for border */
+}
+
+/*
+ * Card hover — subtle cyan border glow on hover.
+ * Usage: className="card-hover"
+ */
+.card-hover {
+  transition:
+    border-color 150ms ease,
+    box-shadow   150ms ease;
+}
+.card-hover:hover {
+  border-color: oklch(0.72 0.175 205 / 0.35);
+  box-shadow: 0 0 24px oklch(0.72 0.175 205 / 0.06);
+}
+
+/*
+ * Live pulse dot — animated green dot for LIVE badges.
+ * Usage: <span className="live-dot" />
+ */
+.live-dot {
+  display: inline-block;
+  width:  8px;
+  height: 8px;
+  border-radius: 50%;
+  background: oklch(0.65 0.175 145);
+  flex-shrink: 0;
+  animation: pulse-live 2s ease-in-out infinite;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1;   transform: scale(1);   }
+  50%       { opacity: 0.4; transform: scale(1.4); }
+}
+
+/*
+ * Gradient border card — thin rainbow-ish border for premium cards.
+ * Usage: className="gradient-border"
+ */
+.gradient-border {
+  position: relative;
+  background: var(--color-card);
+  border-radius: var(--radius);
+}
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    oklch(0.72 0.175 205 / 0.55),
+    oklch(0.60 0.22  290 / 0.30),
+    oklch(0.72 0.175 205 / 0.10)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ── Shadcn component overrides ───────────────────────────────────────────── */
+
+/*
+ * Progress bar fill — cyan
+ */
+[data-slot="progress-indicator"] {
+  background: oklch(0.72 0.175 205) !important;
+}
+
+/*
+ * Tabs active state
+ */
+[data-state="active"][data-slot="tabs-trigger"] {
+  background: oklch(0.72 0.175 205 / 0.15);
+  color: oklch(0.72 0.175 205);
+}
+
+/*
+ * Dialog / Sheet overlay — darker than default
+ */
+[data-slot="dialog-overlay"],
+[data-slot="sheet-overlay"] {
+  background: oklch(0 0 0 / 0.75);
+  backdrop-filter: blur(4px);
+}
+
+/*
+ * Input autofill fix — prevents white flash from browser autofill
+ */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--color-input) inset !important;
+  -webkit-text-fill-color: var(--color-foreground) !important;
+  caret-color: var(--color-foreground);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/*
+ * Select dropdown dark background
+ */
+select option {
+  background: var(--color-card);
+  color: var(--color-foreground);
 }

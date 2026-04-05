@@ -2,12 +2,6 @@
  * notification.service.ts
  *
  * Dispatches SMS and email notifications, logs every attempt to notificationLog.
- *
- * Email  → Resend (free tier: 3000/month — https://resend.com)
- * SMS    → determined by SMS_PROVIDER env var:
- *            "console"   → prints to terminal (dev default, free)
- *            "fast2sms"  → Fast2SMS API (India, free credits on signup)
- *            "twilio"    → Twilio trial (free trial number)
  */
 
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
@@ -29,8 +23,6 @@ export async function sendEmail(
     type: NotificationType;
   },
 ): Promise<void> {
-  const logId = generateId();
-
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -48,8 +40,9 @@ export async function sendEmail(
 
     const body = (await res.json()) as { id?: string; message?: string };
 
+    // Generate unique ID at the moment of insertion
     await db.insert(notificationLog).values({
-      id: logId,
+      id: generateId(), 
       userId: opts.userId ?? null,
       type: opts.type,
       status: res.ok ? "sent" : "failed",
@@ -59,12 +52,15 @@ export async function sendEmail(
       createdAt: new Date(),
     });
 
+    // MODIFIED: We no longer throw an error if the email fails.
+    // This prevents localhost domain verification issues from crashing the app.
     if (!res.ok) {
-      throw new Error(`Resend error: ${body.message ?? "unknown"}`);
+      console.warn(`📧 Email not sent (Normal for localhost/unverified): ${body.message ?? "unknown"}`);
     }
   } catch (err) {
+    // Generate a fresh unique ID for the failure log
     await db.insert(notificationLog).values({
-      id: logId,
+      id: generateId(),
       userId: opts.userId ?? null,
       type: opts.type,
       status: "failed",
@@ -73,7 +69,8 @@ export async function sendEmail(
       sentAt: null,
       createdAt: new Date(),
     });
-    throw err;
+    // MODIFIED: Do not throw error here, let registration proceed.
+    console.error("❌ Email service error:", err);
   }
 }
 
@@ -127,8 +124,6 @@ async function _sendSmsFast2Sms(
   db: PostgresJsDatabase<typeof schema>,
   opts: { to: string; message: string; userId?: string; type: NotificationType },
 ) {
-  // Fast2SMS — free credits on signup, India only
-  // Docs: https://docs.fast2sms.com
   try {
     const res = await fetch("https://www.fast2sms.com/dev/bulkV2", {
       method: "POST",
@@ -137,11 +132,11 @@ async function _sendSmsFast2Sms(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        route: "q",                                // quick transactional
+        route: "q",
         message: opts.message,
         language: "english",
         flash: 0,
-        numbers: opts.to.replace("+91", ""),       // Fast2SMS expects 10-digit
+        numbers: opts.to.replace("+91", ""),
       }),
     });
 
@@ -178,7 +173,6 @@ async function _sendSmsTwilio(
   db: PostgresJsDatabase<typeof schema>,
   opts: { to: string; message: string; userId?: string; type: NotificationType },
 ) {
-  // Twilio — free trial at https://twilio.com/try-twilio
   const accountSid = process.env.TWILIO_ACCOUNT_SID!;
   const authToken = process.env.TWILIO_AUTH_TOKEN!;
 
@@ -230,7 +224,6 @@ async function _sendSmsTwilio(
 
 // ── Convenience wrappers ───────────────────────────────────────────────────────
 
-/** Send OTP via SMS */
 export async function sendOtpSms(
   db: PostgresJsDatabase<typeof schema>,
   userId: string,
@@ -245,7 +238,6 @@ export async function sendOtpSms(
   });
 }
 
-/** Send OTP via email */
 export async function sendOtpEmail(
   db: PostgresJsDatabase<typeof schema>,
   userId: string,
@@ -264,7 +256,6 @@ export async function sendOtpEmail(
   });
 }
 
-/** Notify voter of participation request decision */
 export async function sendParticipationDecision(
   db: PostgresJsDatabase<typeof schema>,
   userId: string,

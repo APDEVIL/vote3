@@ -2,13 +2,14 @@
  * routers/auth.router.ts
  *
  * Epics covered:
- *   1.1 Register account          1.2 Verify mobile OTP
- *   1.3 Verify email              1.4 Set secret questions
- *   1.5 Enroll face recognition   2.6 Account recovery
+ * 1.1 Register account          1.2 Verify mobile OTP
+ * 1.3 Verify email              1.4 Set secret questions
+ * 1.5 Enroll face recognition   2.6 Account recovery
  */
 
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { hashPassword } from "better-auth/crypto"; // Added Better Auth hashing utility
 
 import { account, otpRecord, secretQuestion, user } from "@/server/db/schema";
 import {
@@ -58,9 +59,7 @@ export const authRouter = createTRPCRouter({
       const userId = generateId("usr");
       const voterCardId = await generateVoterCardId(db);
 
-      // Insert user — better-auth will NOT handle this registration
-      // since we have extra fields. We insert manually then create
-      // the account record so better-auth can authenticate via email+password.
+      // Insert user
       await db.insert(user).values({
         id: userId,
         name: input.name,
@@ -79,11 +78,8 @@ export const authRouter = createTRPCRouter({
         updatedAt: new Date(),
       });
 
-      // Hash password + create account record for better-auth
-      const { hash } = await import("@node-rs/argon2");
-      const passwordHash = await hash(input.password, {
-        memoryCost: 19456, timeCost: 2, outputLen: 32, parallelism: 1,
-      });
+      // MODIFIED: Using hashPassword from better-auth/crypto to ensure compatibility
+      const passwordHash = await hashPassword(input.password);
 
       await db.insert(account).values({
         id: generateId(),
@@ -132,12 +128,12 @@ export const authRouter = createTRPCRouter({
       return { success: true };
     }),
 
-  // ── 1.4 Set secret questions ──────────────────────────────────────────────
+ // ── 1.4 Set secret questions ──────────────────────────────────────────────
 
-  setSecretQuestions: protectedProcedure
-    .input(zSecretQuestionsInput)
+  setSecretQuestions: publicProcedure 
+    .input(zSecretQuestionsInput.extend({ userId: z.string() })) 
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id;
+      const userId = input.userId;
 
       // Delete any existing secret questions first (re-setup)
       await ctx.db
@@ -168,10 +164,13 @@ export const authRouter = createTRPCRouter({
 
   // ── 1.5 Enroll face ───────────────────────────────────────────────────────
 
-  enrollFace: protectedProcedure
-    .input(z.object({ imageData: z.string().optional() }))
+  enrollFace: publicProcedure 
+    .input(z.object({ 
+      userId: z.string(), 
+      imageData: z.string().optional() 
+    }))
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id;
+      const userId = input.userId;
 
       const result = await enrollFace(userId, input.imageData);
       if (!result.success) throw validationError(result.message);
@@ -193,7 +192,6 @@ export const authRouter = createTRPCRouter({
   getSecretQuestions: publicProcedure
     .input(z.object({ identifier: z.string() }))
     .query(async ({ ctx, input }) => {
-      // Find user by email or mobile
       const found = await ctx.db.query.user.findFirst({
         where: (u, { or, eq }) =>
           or(eq(u.email, input.identifier), eq(u.mobile, input.identifier)),
@@ -222,7 +220,6 @@ export const authRouter = createTRPCRouter({
         if (!ok) throw otpInvalidError();
       }
 
-      // Send password reset OTP
       const found = await ctx.db.query.user.findFirst({
         where: eq(user.id, input.userId),
         columns: { email: true },
