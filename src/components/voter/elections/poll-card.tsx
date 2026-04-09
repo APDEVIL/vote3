@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { Calendar, Users, BarChart3, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PollStatusBadge } from "@/components/shared/status-badge";
-import { ParticipationBadge } from "@/components/shared/status-badge";
+import { PollStatusBadge, ParticipationBadge } from "@/components/shared/status-badge";
 import { formatDate } from "@/lib/date";
 import { cn } from "@/lib/utils";
 import type { RouterOutputs } from "@/trpc/react";
@@ -67,11 +66,14 @@ export function PollCard({ poll }: PollCardProps) {
           )}
           variant={isLive ? "default" : "outline"}
         >
-          <Link href={`/elections/${poll.id}`}>
+          <Link href={`/elections/${poll.id}${hasResults ? '/results' : ''}`}>
             {hasResults ? (
               <><BarChart3 className="h-4 w-4" /> View Results</>
-            ) : (
+            ) : isLive ? (
               <>Vote Now <ArrowRight className="h-4 w-4" /></>
+            ) : (
+              // FIX: Handle ended/created states properly
+              <>View Details</>
             )}
           </Link>
         </Button>

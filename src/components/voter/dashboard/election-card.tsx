@@ -72,7 +72,8 @@ export function ElectionCard({ poll }: ElectionCardProps) {
             : "border-border text-foreground hover:bg-muted/30",
         )}
       >
-        <Link href={`/elections/${poll.id}`}>
+        {/* FIX: Dynamically append /results if showResults is true */}
+        <Link href={`/elections/${poll.id}${showResults ? '/results' : ''}`}>
           {showResults ? (
             <><BarChart3 className="mr-2 h-4 w-4" /> View Results</>
           ) : isVoted ? (

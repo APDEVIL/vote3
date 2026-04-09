@@ -6,10 +6,10 @@ import { StatCardSkeleton } from "@/components/shared/loading-skeleton";
 import { api } from "@/trpc/react";
 
 export function VoterStatsGrid() {
-  const { data: polls, isLoading } = api.poll.list.useQuery();
-  const { data: allPolls }         = api.poll.listAll.useQuery();
+  const { data: polls, isLoading: isPollsLoading } = api.poll.list.useQuery();
+  const { data: allPolls, isLoading: isAllLoading } = api.poll.listAll.useQuery();
 
-  if (isLoading) {
+  if (isPollsLoading || isAllLoading) {
     return (
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)}
@@ -17,8 +17,11 @@ export function VoterStatsGrid() {
     );
   }
 
+  // Voted relies on the personal `polls` query
   const voted    = polls?.filter((p) => p.hasVoted).length ?? 0;
-  const active   = polls?.filter((p) => p.status === "active").length ?? 0;
+  
+  // Active and Upcoming now rely on the global `allPolls` query
+  const active   = allPolls?.filter((p) => p.status === "active").length ?? 0;
   const upcoming = allPolls?.filter((p) => p.status === "created").length ?? 0;
 
   return (

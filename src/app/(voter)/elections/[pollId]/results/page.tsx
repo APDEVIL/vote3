@@ -1,3 +1,5 @@
+// src/app/(voter)/elections/[pollId]/results/page.tsx
+
 "use client";
 
 import { use } from "react";

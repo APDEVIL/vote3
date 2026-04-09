@@ -6,11 +6,17 @@ import { api } from "@/trpc/react";
 
 export function WelcomeBanner() {
   const { user } = useSession();
+  
+  // Fetch both personal and global polls
   const { data: polls } = api.poll.list.useQuery();
+  const { data: allPolls } = api.poll.listAll.useQuery(); 
   const { data: setup } = api.user.getSetupStatus.useQuery();
 
   const firstName  = user?.name?.split(" ")[0] ?? "Voter";
-  const liveCount  = polls?.filter((p) => p.status === "active").length ?? 0;
+  
+  // Use allPolls for the global live count
+  const liveCount  = allPolls?.filter((p) => p.status === "active").length ?? 0;
+  // Use personal polls for the voted count
   const votedCount = polls?.filter((p) => p.hasVoted).length ?? 0;
 
   return (

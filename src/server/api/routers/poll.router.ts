@@ -1,3 +1,5 @@
+// src/server/api/routers/poll.router.ts
+
 /**
  * routers/poll.router.ts
  *
@@ -107,12 +109,29 @@ export const pollRouter = createTRPCRouter({
       const found = await ctx.db.query.poll.findFirst({
         where: eq(poll.id, input.pollId),
         columns: { id: true, status: true, title: true },
+        // FETCH CANDIDATES HERE TO GET NAMES
+        with: {
+          candidates: {
+            columns: { id: true, name: true }
+          }
+        }
       });
 
       if (!found) throw pollNotFoundError();
       if (found.status !== "result_available") throw pollResultsNotAvailableError();
 
-      const results = await calculateResults(ctx.db, input.pollId);
+      const rawResults = await calculateResults(ctx.db, input.pollId);
+
+      // MERGE NAMES WITH VOTE COUNTS
+      const results = (found.candidates ?? []).map((c) => {
+        const voteData = rawResults.find((r) => r.candidateId === c.id);
+        return {
+          candidateId: c.id,
+          name: c.name,
+          votes: voteData?.votes ?? 0,
+        };
+      }).sort((a, b) => b.votes - a.votes); // Sort by winner first
+
       return { poll: found, results };
     }),
 
